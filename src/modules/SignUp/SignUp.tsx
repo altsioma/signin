@@ -1,44 +1,39 @@
 import React from "react";
-import { LoginForm, FormRow } from "../components/LoginForm/LoginForm";
-import { Input } from "../components/Input";
-import { RadioButton } from "../components/Radio";
-import { LinkStyled } from "../components/Link";
-import { ErrorLabel } from "../components/ErrorLabel";
-import { CheckBox } from "../components/Checkbox";
-import { FormSubRow } from "../components/LoginForm/LoginForm";
-import { ButtonStyled } from "../components/Button/";
-import { countries } from "../init";
-import { List } from "../components/List";
-import emailIco from "../img/ico-email.svg";
-import passwordIco from "../img/ico-password.svg";
+import { SignUpForm, FormRow, FormSubRow } from "./components/SignUpForm";
+import { Input } from "../../components/Input";
+import { RadioButton } from "../../components/Radio";
+import { LinkStyled } from "../../components/Link";
+import { ErrorLabel } from "../../components/ErrorLabel";
+import { CheckBox } from "../../components/Checkbox";
+import { ButtonStyled } from "../../components/Button/";
+import { countries } from "../../init";
+import { List } from "../../components/List";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-const genders = ["Male", "Female"];
+import { initialValues, validate, Genders } from "./validator";
+import emailIco from "../../img/ico-email.svg";
+import passwordIco from "../../img/ico-password.svg";
+import { gql, useMutation } from "@apollo/client";
 
-export const Login: React.FC = () => {
+const SIGN_UP = gql`
+  mutation SignUp($input: SignupInput!) {
+    signup(input: $input) {
+      id
+      email
+    }
+  }
+`;
+
+export const SignUp: React.FC = () => {
   const validator = useFormik({
-    initialValues: {
-      name: "",
-      email: "",
-      password: "",
-      country: "",
-      gender: null,
-      agreement: "false",
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required().matches(/^[a-zA-Z]+$/, "Please enter a valid name"),
-      email: Yup.string().required().email("Please enter a valid email address"),
-      password: Yup.string().required().min(6, "Password must contain at least 6 symbols"),
-      country: Yup.string().required("You must select your country"),
-      gender: Yup.string().oneOf(genders, "You must select the gender"),
-      agreement: Yup.boolean().oneOf([true], "You must accept the policies"),
-    }),
+    initialValues,
+    validate,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      signUp({ variables: {input: values} });
     },
   });
+  const [signUp, { loading, error }] = useMutation(SIGN_UP);
   return (
-    <LoginForm title="Create a new account" onSubmit={validator.handleSubmit}>
+    <SignUpForm title="Create a new account" onSubmit={validator.handleSubmit}>
       <FormRow>
         <Input
           name="name"
@@ -47,7 +42,7 @@ export const Login: React.FC = () => {
           onChange={validator.handleChange}
           placeholder="Enter your name"
         />
-        {validator.touched.email && validator.errors.name && (
+        {validator.touched.name && validator.errors.name && (
           <ErrorLabel text={validator.errors.name} />
         )}
       </FormRow>
@@ -83,15 +78,15 @@ export const Login: React.FC = () => {
           items={countries}
           placeholder="Select country"
         />
-        {validator.errors.country && (
+        {validator.touched.country && validator.errors.country && (
           <ErrorLabel text={validator.errors.country} />
         )}
       </FormRow>
       <FormSubRow>
-        {genders.map((value, index) => (
+        {Object.keys(Genders).map((value, index) =>(
           <RadioButton
             key={index}
-            value={value}
+            value={Genders.Female}
             name="gender"
             onBlur={validator.handleBlur}
             onChange={validator.handleChange}
@@ -121,9 +116,10 @@ export const Login: React.FC = () => {
       </FormSubRow>
       <FormRow style={{ paddingTop: 16 }}>
         <ButtonStyled disabled={!validator.isValid || !validator.dirty}>
-          Sign Up
+          {!loading && "Sign Up"}
         </ButtonStyled>
+        {error && <ErrorLabel text={error.message} />}
       </FormRow>
-    </LoginForm>
+    </SignUpForm>
   );
 };

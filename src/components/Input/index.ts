@@ -1,1 +1,1 @@
-export { Input } from "./Input.styled";
+export { Input } from "./Input";

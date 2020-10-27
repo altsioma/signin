@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { TypoGraphy } from "../Common/";
+import { TypoGraphy, ThemeColors } from "../Common";
 import { InputHTMLAttributes } from "react";
 
 type InputType = {
@@ -23,8 +23,8 @@ export const Input = styled.input<InputType>(
   background-color: #f5f8fa;
   padding-top: 17px;
   padding-bottom: 16px;
-  &:placeholder {
-    ${TypoGraphy.placeholder};
+  &::placeholder {
+    color: ${ThemeColors.grey};
     letter-spacing: 0px;
   }
   `
