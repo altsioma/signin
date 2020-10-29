@@ -114,9 +114,14 @@ export const SignUp: React.FC = () => {
           value={validator.values.agreement}
         >
           <span>Accept</span>
-          <Link disabled={loading} href="/terms"> terms </Link>
+          <Link disabled={loading} href="/terms">
+            {" "}
+            terms{" "}
+          </Link>
           <span> and </span>
-          <Link disabled={loading}  href="/conditions">conditions</Link>
+          <Link disabled={loading} href="/conditions">
+            conditions
+          </Link>
         </CheckBox>
         {validator.touched.agreement && validator.errors.agreement && (
           <ErrorLabel text={validator.errors.agreement} />
@@ -125,7 +130,7 @@ export const SignUp: React.FC = () => {
       <FormRow style={{ paddingTop: 16 }}>
         <Button
           type="submit"
-          disabled={(!loading && !validator.isValid) || !validator.dirty}
+          disabled={loading || !validator.isValid || !validator.dirty}
         >
           Sign Up
         </Button>

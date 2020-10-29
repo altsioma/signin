@@ -5,8 +5,8 @@ import arrow from "./img/ico-arrow.svg";
 
 export interface ListBaseProps {
   isListOpened?: boolean;
-  disabled?: boolean
-};
+  disabled?: boolean;
+}
 
 const LabelStyled = styled("label")<ListBaseProps>`
   position: relative;
@@ -73,13 +73,12 @@ interface ItemType {
   label: string;
 }
 
-interface ListProps extends ListBaseProps{
-  
-  name: string;
+interface ListProps extends ListBaseProps {
+  name?: string;
   items: ItemType[];
   placeholder: string;
-  onChange: (value: ItemType) => {};
-  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onChange?: (value: ItemType) => {};
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export const List: React.FC<ListProps> = ({
@@ -88,7 +87,7 @@ export const List: React.FC<ListProps> = ({
   onChange,
   onBlur,
   name,
-  disabled
+  disabled,
 }) => {
   const [isListOpened, toggleList] = useState(false);
   const [selectedItem, setItem] = useState<ItemType>();
@@ -112,9 +111,8 @@ export const List: React.FC<ListProps> = ({
   );
 
   const toggleListHandler = useCallback(() => {
-    !disabled &&
-    toggleList(!isListOpened);
-  }, [isListOpened]);
+    !disabled && toggleList(!isListOpened);
+  }, [isListOpened, disabled]);
 
   useEffect(() => {
     document.addEventListener("click", clickListener);
