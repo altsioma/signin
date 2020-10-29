@@ -9,21 +9,8 @@ export default {
   component: List,
 } as Meta;
 
-const Template: Story = ({ args }) => <List {...args} />;
-
-export const Primary = Template.bind({});
-Primary.args = {
-  placeholder: "This is a List",
-  items: countries,
-};
-
-export const PrimaryDisabled = Template.bind({});
-PrimaryDisabled.args = {
-  placeholder: "This is a disabled List",
-  items: countries,
-  disabled: true,
-};
-
+export const Primary = () => <List placeholder="Please enter your name" items={countries} />
+export const PrimaryDisabled = () => <List disabled placeholder="Please enter your name" items={countries} />
 export const PrimaryError = () => (
   <>
     <List placeholder="Please enter your name" items={countries} />
