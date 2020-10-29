@@ -3,25 +3,17 @@ import { TypoGraphy, ThemeColors } from "../Common";
 import styled from "@emotion/styled";
 import arrow from "./img/ico-arrow.svg";
 
-export type ListBaseProps = {
+export interface ListBaseProps {
   isListOpened?: boolean;
-  isSelected?: boolean;
+  disabled?: boolean
 };
 
-export const ListInputStyled = styled("div")<ListBaseProps>`
-  ${(props: ListBaseProps) =>
-    props.isSelected ? TypoGraphy.plainBlack : TypoGraphy.placeholder}
-  width: 100%;
-  height: 50px;
-  border-radius: 8px;
-  border: none;
-  background-color: #f5f8fa;
-  padding: 16px 0 16px 17px;
+const LabelStyled = styled("label")<ListBaseProps>`
   position: relative;
-  &:after {
+  &::after {
     position: absolute;
     right: 21px;
-    top: 20px;
+    top: 6px;
     width: 11px;
     height: 11px;
     content: "";
@@ -29,6 +21,14 @@ export const ListInputStyled = styled("div")<ListBaseProps>`
     transform: ${(props: ListBaseProps) =>
       props.isListOpened && "rotate(180deg)"};
   }
+`;
+export const InputStyled = styled("input")<ListBaseProps>`
+  width: 100%;
+  height: 50px;
+  border-radius: 8px;
+  border: none;
+  background-color: #f5f8fa;
+  padding: 16px 0 16px 17px;
   &:hover {
     cursor: pointer;
   }
@@ -68,29 +68,40 @@ padding: 10px 0 9px 20px;
   TypoGraphy.plainBlack
 );
 
-type ItemType = {
+interface ItemType {
   value: string | number;
   label: string;
-};
+}
 
-type ListProps = ListBaseProps & {
+interface ListProps extends ListBaseProps{
+  
+  name: string;
   items: ItemType[];
   placeholder: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-};
+  onChange: (value: ItemType) => {};
+  onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+}
 
-export const List: React.FC<ListProps> = ({ items, placeholder, onChange }) => {
+export const List: React.FC<ListProps> = ({
+  items,
+  placeholder,
+  onChange,
+  onBlur,
+  name,
+  disabled
+}) => {
   const [isListOpened, toggleList] = useState(false);
   const [selectedItem, setItem] = useState<ItemType>();
   const ref = useRef(null);
   const selectItem = useCallback(
     (item) => {
       setItem(item);
+      onChange && onChange(item);
       toggleList(false);
-      onChange(item.value);
     },
     [onChange]
   );
+
   const clickListener = useCallback(
     (e: MouseEvent) => {
       if (!(ref.current! as any).contains(e.target)) {
@@ -99,21 +110,32 @@ export const List: React.FC<ListProps> = ({ items, placeholder, onChange }) => {
     },
     [ref]
   );
-  const toggleListHandler = useCallback(() => { 
+
+  const toggleListHandler = useCallback(() => {
+    !disabled &&
     toggleList(!isListOpened);
   }, [isListOpened]);
+
   useEffect(() => {
     document.addEventListener("click", clickListener);
     return () => {
       document.removeEventListener("click", clickListener);
     };
   }, [clickListener]);
+
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <ListInputStyled onClick={toggleListHandler} isSelected={!!selectedItem} isListOpened={isListOpened}>
-        {selectedItem ? selectedItem.label : placeholder}
-      </ListInputStyled>
-
+      <LabelStyled>
+        <InputStyled
+          readOnly
+          onBlur={onBlur}
+          onClick={toggleListHandler}
+          isListOpened={isListOpened}
+          name={name}
+          placeholder={placeholder}
+          value={selectedItem ? selectedItem.label : ""}
+        />
+      </LabelStyled>
       <ListItemsStyled isListOpened={isListOpened}>
         {items.map((item, index) => (
           <ItemStyled onClick={() => selectItem(item)} key={index}>

@@ -17,6 +17,7 @@ export const Input = styled.input<InputType>(
   TypoGraphy.plainBlack,
   `
   width: 100%;
+  max-width:400px;
   height: 50px;
   border-radius: 8px;
   border: none;

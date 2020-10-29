@@ -1,7 +1,7 @@
 export const countries = [
-  { label: "Latvia", value: "0" },
-  { label: "Lebanon", value: "1" },
-  { label: "Lesotho", value: "2" },
-  { label: "Liberia", value: "3" },
-  { label: "Libya", value: "4" },
+  { label: "Latvia", value: "Latvia" },
+  { label: "Lebanon", value: "Lebanon" },
+  { label: "Lesotho", value: "Lesotho" },
+  { label: "Liberia", value: "Liberia" },
+  { label: "Libya", value: "Libya" },
 ];

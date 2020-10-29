@@ -1,42 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
+import emailIco from "../../img/ico-email.svg";
+import passwordIco from "../../img/ico-password.svg";
+
 import { SignUpForm, FormRow, FormSubRow } from "./components/SignUpForm";
 import { Input } from "../../components/Input";
 import { RadioButton } from "../../components/Radio";
-import { LinkStyled } from "../../components/Link";
+import { Link } from "../../components/Link";
 import { ErrorLabel } from "../../components/ErrorLabel";
 import { CheckBox } from "../../components/Checkbox";
-import { ButtonStyled } from "../../components/Button/";
-import { countries } from "../../init";
+import { Button } from "../../components/Button/";
 import { List } from "../../components/List";
-import { useFormik } from "formik";
 import { initialValues, validate, Genders } from "./validator";
-import emailIco from "../../img/ico-email.svg";
-import passwordIco from "../../img/ico-password.svg";
-import { gql, useMutation } from "@apollo/client";
-
-const SIGN_UP = gql`
-  mutation SignUp($input: SignupInput!) {
-    signup(input: $input) {
-      id
-      email
-    }
-  }
-`;
+import { countries } from "../../init";
+import { SIGN_UP } from "./graphql";
+import { useMutation } from "@apollo/client";
+import { useFormik } from "formik";
 
 export const SignUp: React.FC = () => {
+  const [error, setError] = useState("");
+  const [signUp, { loading, data }] = useMutation(SIGN_UP);
   const validator = useFormik({
     initialValues,
     validate,
     onSubmit: (values) => {
-      signUp({ variables: {input: values} });
+      const { agreement, ...inputValue } = values;
+      signUp({ variables: { input: inputValue } }).catch((e: Error) =>
+        setError(e.message)
+      );
     },
   });
-  const [signUp, { loading, error }] = useMutation(SIGN_UP);
-  return (
+
+  return data ? (
+    <pre style={{ color: "white" }}>{JSON.stringify(data)}</pre>
+  ) : (
     <SignUpForm title="Create a new account" onSubmit={validator.handleSubmit}>
       <FormRow>
         <Input
           name="name"
+          disabled={loading}
           value={validator.values.name}
           onBlur={validator.handleBlur}
           onChange={validator.handleChange}
@@ -48,6 +49,7 @@ export const SignUp: React.FC = () => {
       </FormRow>
       <FormRow>
         <Input
+          disabled={loading}
           name="email"
           onBlur={validator.handleBlur}
           onChange={validator.handleChange}
@@ -60,6 +62,7 @@ export const SignUp: React.FC = () => {
       </FormRow>
       <FormRow>
         <Input
+          disabled={loading}
           autoComplete="disabled"
           name="password"
           onBlur={validator.handleBlur}
@@ -74,7 +77,10 @@ export const SignUp: React.FC = () => {
       </FormRow>
       <FormRow>
         <List
-          onChange={(value) => validator.setFieldValue("country", value)}
+          disabled={loading}
+          name="country"
+          onBlur={validator.handleBlur}
+          onChange={(item) => validator.setFieldValue("country", item.value)}
           items={countries}
           placeholder="Select country"
         />
@@ -83,8 +89,9 @@ export const SignUp: React.FC = () => {
         )}
       </FormRow>
       <FormSubRow>
-        {Object.keys(Genders).map((value, index) =>(
+        {Object.keys(Genders).map((value, index) => (
           <RadioButton
+            disabled={loading}
             key={index}
             value={Genders.Female}
             name="gender"
@@ -100,25 +107,29 @@ export const SignUp: React.FC = () => {
       </FormSubRow>
       <FormSubRow>
         <CheckBox
+          disabled={loading}
           name="agreement"
           onBlur={validator.handleBlur}
           onChange={validator.handleChange}
           value={validator.values.agreement}
         >
           <span>Accept</span>
-          <LinkStyled href="/terms"> terms </LinkStyled>
+          <Link disabled={loading} href="/terms"> terms </Link>
           <span> and </span>
-          <LinkStyled href="/conditions">conditions</LinkStyled>
+          <Link disabled={loading}  href="/conditions">conditions</Link>
         </CheckBox>
         {validator.touched.agreement && validator.errors.agreement && (
           <ErrorLabel text={validator.errors.agreement} />
         )}
       </FormSubRow>
       <FormRow style={{ paddingTop: 16 }}>
-        <ButtonStyled disabled={!validator.isValid || !validator.dirty}>
-          {!loading && "Sign Up"}
-        </ButtonStyled>
-        {error && <ErrorLabel text={error.message} />}
+        <Button
+          type="submit"
+          disabled={(!loading && !validator.isValid) || !validator.dirty}
+        >
+          Sign Up
+        </Button>
+        {error && <ErrorLabel text={error} />}
       </FormRow>
     </SignUpForm>
   );

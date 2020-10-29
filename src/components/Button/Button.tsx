@@ -1,7 +1,11 @@
 import styled from "@emotion/styled";
 import { TypoGraphy, ThemeColors } from "../Common/";
 
-export const ButtonStyled = styled.button(
+interface ButtonProps {
+  disabled?: boolean;
+}
+
+export const Button = styled.button<ButtonProps>(
   `
   background: #0094ff;
   border: none;

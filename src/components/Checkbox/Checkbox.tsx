@@ -1,7 +1,9 @@
 import React, { InputHTMLAttributes } from "react";
 import styled from "@emotion/styled";
 import { TypoGraphy, ThemeColors } from "../Common/";
-
+interface CheckBoxProps {
+  disabled?: boolean;
+}
 const LabelStyled = styled.label(
   `  
   display: inline-block;
@@ -11,13 +13,13 @@ const LabelStyled = styled.label(
   TypoGraphy.plainBlack
 );
 
-const CheckBoxCustom = styled.span(`
+const CheckBoxCustom = styled("span")<CheckBoxProps>`
   position: absolute;
   top: 2px;
   left: 0;
   height: 14px;
   width: 14px;
-  border: 1px solid ${ThemeColors.blue};
+  border: 1px solid ${({disabled}:CheckBoxProps)=> disabled ? ThemeColors.grey : ThemeColors.blue};
   border-radius: 3px;
     &::after {
       content: "";
@@ -31,11 +33,11 @@ const CheckBoxCustom = styled.span(`
       border-width: 0 1px 1px 0;
       transform: rotate(45deg);
     }
-`);
+`;
 
 const InputCheckboxStyled = styled.input(`
   position: absolute;
-  opacity: 0; 
+  opacity: 0;
   &:checked + span {
     &::after {
       display: block;
@@ -49,10 +51,7 @@ export const CheckBox: React.FC<InputHTMLAttributes<HTMLInputElement>> = ({
 }) => (
   <LabelStyled>
     {children}
-    <InputCheckboxStyled
-      type="checkbox"
-      {...props}
-    />
+    <InputCheckboxStyled type="checkbox" {...props} />
     <CheckBoxCustom />
   </LabelStyled>
 );

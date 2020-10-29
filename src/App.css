@@ -6,6 +6,9 @@ body {
   min-height: 100vh;
   max-width: 100vw;
 }
+.main-theme {
+  background-color: #102250;
+}
 *,
 *:before,
 *:after {
